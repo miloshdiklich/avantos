@@ -59,7 +59,7 @@ const ConfigureFieldDialog = ({
             type="text"
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            style={{ width: '100%', marginTop: '0.25rem' }}
+            style={{ width: '100%', marginTop: '0.25rem', backgroundColor: 'white' }}
             placeholder="e.g. Form A.email or client.name"
           />
         </label>
