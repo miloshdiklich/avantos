@@ -3,9 +3,10 @@ import type { Form, PrefillMappings } from '../types/domain';
 import { useGraphData } from '../hooks/useGraphData';
 import FormList from '../components/forms/FormList';
 import ConfigureFieldDialog from '../components/forms/ConfigureFieldDialog';
+import { getDirectParents, getTransitiveParents } from '../utils/graph';
 
 const FormsPage = () => {
-  const { forms, isLoading, error } = useGraphData();
+  const { forms, edges, isLoading, error } = useGraphData();
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
   const [mappings, setMappings] = useState<PrefillMappings>({});
@@ -14,6 +15,33 @@ const FormsPage = () => {
 
   const selectedForm: Form | null =
     forms.find((form) => form.id === selectedFormId) ?? null;
+
+  const directParentIds = selectedForm
+    ? getDirectParents(selectedForm.id, edges)
+    : [];
+  
+  const transitiveParentIds = selectedForm
+    ? getTransitiveParents(selectedForm.id, edges)
+    : [];
+
+  // TEMP DEBUG
+  // eslint-disable-next-line no-console
+  console.log('DEBUG graph', {
+    selectedFormId,
+    selectedForm,
+    edges,
+    directParentIds,
+    transitiveParentIds,
+  });
+  
+  // Convert IDs → actual Form objects
+  const directParents: Form[] = directParentIds
+    .map((id) => forms.find((f) => f.id === id) ?? null)
+    .filter((f): f is Form => f !== null);
+  
+  const transitiveParents: Form[] = transitiveParentIds
+    .map((id) => forms.find((f) => f.id === id) ?? null)
+    .filter((f): f is Form => f !== null);
 
   const currentFormMappings = selectedForm
     ? mappings[selectedForm.id] ?? {}
@@ -33,27 +61,6 @@ const FormsPage = () => {
     setEditingFieldId(null);
   };
 
-  const handleSaveMapping = (sourceLabel: string): void => {
-    if (!selectedForm || !editingFieldId) {
-      handleCloseDialog();
-      return;
-    }
-
-    setMappings((prev) => {
-      const formMappings = prev[selectedForm.id] ?? {};
-
-      return {
-        ...prev,
-        [selectedForm.id]: {
-          ...formMappings,
-          [editingFieldId]: sourceLabel,
-        },
-      };
-    });
-
-    handleCloseDialog();
-  };
-
   const handleClearMapping = (fieldId: string): void => {
     if (!selectedForm) {
       return;
@@ -69,6 +76,31 @@ const FormsPage = () => {
       };
     });
   };
+
+  const handleSourceSelected = (source: {
+    type: 'form';
+    formId: string;
+    fieldId: string;
+  }): void => {
+    if (!selectedForm || !editingFieldId) {
+      handleCloseDialog();
+      return;
+    }
+  
+    // Temporary display label
+    const display = `${source.formId}.${source.fieldId}`;
+  
+    setMappings((prev) => ({
+      ...prev,
+      [selectedForm.id]: {
+        ...(prev[selectedForm.id] ?? {}),
+        [editingFieldId]: display,
+      },
+    }));
+  
+    handleCloseDialog();
+  };
+  
 
   if (isLoading) {
     return <div style={{ padding: '1rem' }}>Loading forms…</div>;
@@ -171,11 +203,13 @@ const FormsPage = () => {
         <ConfigureFieldDialog
           isOpen={isDialogOpen}
           fieldLabel={editingField.label}
-          initialValue={currentFormMappings[editingField.id] ?? ''}
-          onSave={handleSaveMapping}
+          directParents={directParents}
+          transitiveParents={transitiveParents}
+          onSelectSource={handleSourceSelected}
           onCancel={handleCloseDialog}
         />
       )}
+
     </>
   );
 };
