@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react"
-import type { Edge, Form } from "../types"
+import type { Edge, Form } from "../types/domain"
 import { fetchGraphForms } from "../api/graph";
 
-interface GraphFormsResult {
+interface UseGraphData {
   forms: Form[],
-  edges: {
-    from: string,
-    to: string,
-  }[],
+  edges: Edge[],
   isLoading: boolean,
   error: string | null,
 }
 
-export const useGraphForms = (): GraphFormsResult => {
+export const useGraphData = (): UseGraphData => {
   const [forms, setForms] = useState<Form[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -38,6 +35,7 @@ export const useGraphForms = (): GraphFormsResult => {
 
   return {
     forms,
+    edges,
     isLoading,
     error,
   }

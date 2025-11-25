@@ -1,29 +1,28 @@
-// src/FormsPage.tsx
 import { useState } from 'react';
-import type { Form, PrefillMappings } from '../types';
-import FormList from '../components/FormList';
-import { useGraphForms } from '../hooks/useGraphForms';
-import ConfigureFieldDialog from '../components/ConfigureFieldDialog';
+import type { Form, PrefillMappings } from '../types/domain';
+import { useGraphData } from '../hooks/useGraphData';
+import FormList from '../components/forms/FormList';
+import ConfigureFieldDialog from '../components/forms/ConfigureFieldDialog';
 
 const FormsPage = () => {
-  const { forms, isLoading, error } = useGraphForms();
+  const { forms, isLoading, error } = useGraphData();
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
   const [mappings, setMappings] = useState<PrefillMappings>({});
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
 
   const selectedForm: Form | null =
-    forms.find((f) => f.id === selectedFormId) ?? null;
+    forms.find((form) => form.id === selectedFormId) ?? null;
 
   const currentFormMappings = selectedForm
     ? mappings[selectedForm.id] ?? {}
     : {};
 
   const handleOpenConfigure = (fieldId: string): void => {
-    // sanity: we only allow configuring when a form is selected
-    if (!selectedForm) return;
+    if (!selectedForm) {
+      return;
+    }
 
     setEditingFieldId(fieldId);
     setIsDialogOpen(true);
@@ -56,7 +55,9 @@ const FormsPage = () => {
   };
 
   const handleClearMapping = (fieldId: string): void => {
-    if (!selectedForm) return;
+    if (!selectedForm) {
+      return;
+    }
 
     setMappings((prev) => {
       const formMappings = { ...(prev[selectedForm.id] ?? {}) };
@@ -87,13 +88,19 @@ const FormsPage = () => {
 
   const editingField =
     selectedForm && editingFieldId
-      ? selectedForm.fields.find((f) => f.id === editingFieldId) ?? null
+      ? selectedForm.fields.find((field) => field.id === editingFieldId) ?? null
       : null;
 
   return (
     <>
       <div style={{ display: 'flex', height: '100vh' }}>
-        <aside style={{ width: '260px', borderRight: '1px solid #ddd', padding: '1rem' }}>
+        <aside
+          style={{
+            width: '260px',
+            borderRight: '1px solid #ddd',
+            padding: '1rem',
+          }}
+        >
           <h2 style={{ marginTop: 0 }}>Forms</h2>
           <FormList
             forms={forms}
@@ -160,17 +167,15 @@ const FormsPage = () => {
         </main>
       </div>
 
-      <ConfigureFieldDialog
-        isOpen={isDialogOpen && !!editingField}
-        fieldLabel={editingField?.label ?? ''}
-        initialValue={
-          editingField && currentFormMappings[editingField.id]
-            ? currentFormMappings[editingField.id]
-            : ''
-        }
-        onSave={handleSaveMapping}
-        onCancel={handleCloseDialog}
-      />
+      {editingField && (
+        <ConfigureFieldDialog
+          isOpen={isDialogOpen}
+          fieldLabel={editingField.label}
+          initialValue={currentFormMappings[editingField.id] ?? ''}
+          onSave={handleSaveMapping}
+          onCancel={handleCloseDialog}
+        />
+      )}
     </>
   );
 };
