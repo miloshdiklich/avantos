@@ -1,52 +1,178 @@
-import { useState } from "react";
-import FormList from "../components/FormList";
-import { useGraphForms } from "../hooks/useGraphForms";
+// src/FormsPage.tsx
+import { useState } from 'react';
+import type { Form, PrefillMappings } from '../types';
+import FormList from '../components/FormList';
+import { useGraphForms } from '../hooks/useGraphForms';
+import ConfigureFieldDialog from '../components/ConfigureFieldDialog';
 
 const FormsPage = () => {
   const { forms, isLoading, error } = useGraphForms();
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
 
-  const selectedForm = forms.find(form => form.id === selectedFormId) ?? null;
+  const [mappings, setMappings] = useState<PrefillMappings>({});
 
-  if(isLoading) {
-    return <div>Loading forms...</div>
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
+
+  const selectedForm: Form | null =
+    forms.find((f) => f.id === selectedFormId) ?? null;
+
+  const currentFormMappings = selectedForm
+    ? mappings[selectedForm.id] ?? {}
+    : {};
+
+  const handleOpenConfigure = (fieldId: string): void => {
+    // sanity: we only allow configuring when a form is selected
+    if (!selectedForm) return;
+
+    setEditingFieldId(fieldId);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = (): void => {
+    setIsDialogOpen(false);
+    setEditingFieldId(null);
+  };
+
+  const handleSaveMapping = (sourceLabel: string): void => {
+    if (!selectedForm || !editingFieldId) {
+      handleCloseDialog();
+      return;
+    }
+
+    setMappings((prev) => {
+      const formMappings = prev[selectedForm.id] ?? {};
+
+      return {
+        ...prev,
+        [selectedForm.id]: {
+          ...formMappings,
+          [editingFieldId]: sourceLabel,
+        },
+      };
+    });
+
+    handleCloseDialog();
+  };
+
+  const handleClearMapping = (fieldId: string): void => {
+    if (!selectedForm) return;
+
+    setMappings((prev) => {
+      const formMappings = { ...(prev[selectedForm.id] ?? {}) };
+      delete formMappings[fieldId];
+
+      return {
+        ...prev,
+        [selectedForm.id]: formMappings,
+      };
+    });
+  };
+
+  if (isLoading) {
+    return <div style={{ padding: '1rem' }}>Loading forms…</div>;
   }
 
-  if(error !== null) {
-    return <div>Error loading forms: {error}</div>
+  if (error !== null) {
+    return (
+      <div style={{ padding: '1rem', color: 'red' }}>
+        Error loading forms: {error}
+      </div>
+    );
   }
 
-  if(forms.length === 0) {
-    return <div>No forms available</div>
+  if (forms.length === 0) {
+    return <div style={{ padding: '1rem' }}>No forms available.</div>;
   }
+
+  const editingField =
+    selectedForm && editingFieldId
+      ? selectedForm.fields.find((f) => f.id === editingFieldId) ?? null
+      : null;
 
   return (
-    <div>
-      {/* Left panel */}
-      <aside>
-        <h2>Forms</h2>
-        <FormList 
-          forms={forms}
-          selectedFormId={selectedFormId}
-          onSelectForm={setSelectedFormId}
-        />
-      </aside>
-      {/* Right panel - detail, prefill editor */}
-      <main>
-        <h2>prefill configuration</h2>
-        {
-          selectedForm === null ? (
-            <p>Select a form on the left to configure its prefill rules</p>
+    <>
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <aside style={{ width: '260px', borderRight: '1px solid #ddd', padding: '1rem' }}>
+          <h2 style={{ marginTop: 0 }}>Forms</h2>
+          <FormList
+            forms={forms}
+            selectedFormId={selectedFormId}
+            onSelectForm={setSelectedFormId}
+          />
+        </aside>
+
+        <main style={{ flex: 1, padding: '1rem' }}>
+          <h2 style={{ marginTop: 0 }}>Prefill configuration</h2>
+
+          {selectedForm === null ? (
+            <p>Select a form on the left to configure its prefill rules.</p>
           ) : (
             <div>
               <h3>{selectedForm.name}</h3>
-              <p>Here we'll show the fields of this form and allow configuration</p>
+
+              {selectedForm.fields.length === 0 ? (
+                <p>This form has no fields defined in its schema.</p>
+              ) : (
+                <table style={{ borderCollapse: 'collapse', minWidth: '480px' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left', padding: '4px' }}>Field</th>
+                      <th style={{ textAlign: 'left', padding: '4px' }}>Prefill from</th>
+                      <th style={{ textAlign: 'left', padding: '4px' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedForm.fields.map((field) => {
+                      const sourceLabel = currentFormMappings[field.id];
+
+                      return (
+                        <tr key={field.id}>
+                          <td style={{ padding: '4px' }}>{field.label}</td>
+                          <td style={{ padding: '4px' }}>
+                            {sourceLabel ?? 'Not configured'}
+                          </td>
+                          <td style={{ padding: '4px' }}>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenConfigure(field.id)}
+                            >
+                              Configure
+                            </button>
+                            {sourceLabel && (
+                              <button
+                                type="button"
+                                onClick={() => handleClearMapping(field.id)}
+                                style={{ marginLeft: '0.5rem' }}
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
             </div>
-          )
+          )}
+        </main>
+      </div>
+
+      <ConfigureFieldDialog
+        isOpen={isDialogOpen && !!editingField}
+        fieldLabel={editingField?.label ?? ''}
+        initialValue={
+          editingField && currentFormMappings[editingField.id]
+            ? currentFormMappings[editingField.id]
+            : ''
         }
-      </main>
-    </div>
-  )
-}
+        onSave={handleSaveMapping}
+        onCancel={handleCloseDialog}
+      />
+    </>
+  );
+};
 
 export default FormsPage;
