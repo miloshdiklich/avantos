@@ -44,6 +44,7 @@ const ConfigureFieldDialog = ({
           maxHeight: '80vh',
           overflow: 'auto',
           boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+          color: 'black',
         }}
       >
         <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>Configure prefill</h3>
@@ -81,6 +82,7 @@ const ConfigureFieldDialog = ({
                           border: '1px solid #ccc',
                           background: '#f8f8f8',
                           cursor: 'pointer',
+                          color: 'black',
                         }}
                       >
                         {field.label}
@@ -122,6 +124,7 @@ const ConfigureFieldDialog = ({
                           border: '1px solid #ccc',
                           background: '#f8f8f8',
                           cursor: 'pointer',
+                          color: 'black',
                         }}
                       >
                         {field.label}

@@ -24,16 +24,6 @@ const FormsPage = () => {
     ? getTransitiveParents(selectedForm.id, edges)
     : [];
 
-  // TEMP DEBUG
-  // eslint-disable-next-line no-console
-  console.log('DEBUG graph', {
-    selectedFormId,
-    selectedForm,
-    edges,
-    directParentIds,
-    transitiveParentIds,
-  });
-  
   // Convert IDs → actual Form objects
   const directParents: Form[] = directParentIds
     .map((id) => forms.find((f) => f.id === id) ?? null)

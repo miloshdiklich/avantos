@@ -11,7 +11,16 @@ export type ApiEdge = {
   target: string;
 }
 
+export type ApiNode = {
+  id: string,
+  type?: string,
+  data?: {
+    component_id?: string,
+  }
+}
+
 export type ApiGraphResponse = {
-  forms?: ApiForm[];
-  edges?: ApiEdge[];
+  forms?: ApiForm[],
+  edges?: ApiEdge[],
+  nodes?: ApiNode[],
 }
