@@ -20,8 +20,14 @@ describe('buildNodeToFormMap', () => {
     const result = buildNodeToFormMap(nodes);
 
     expect(result).toEqual({
-      'node-1': 'f_1',
-      'node-2': 'f_2',
+      nodeToForm: {
+        'node-1': 'f_1',
+        'node-2': 'f_2',
+      },
+      formNames: {
+        'f_1': 'f_1',
+        'f_2': 'f_2',
+      },
     });
   });
 
@@ -42,7 +48,12 @@ describe('buildNodeToFormMap', () => {
     const result = buildNodeToFormMap(nodes);
 
     expect(result).toEqual({
-      'node-1': 'f_1',
+      nodeToForm: {
+        'node-1': 'f_1',
+      },
+      formNames: {
+        'f_1': 'f_1',
+      },
     });
   });
 
@@ -67,12 +78,48 @@ describe('buildNodeToFormMap', () => {
     const result = buildNodeToFormMap(nodes);
 
     expect(result).toEqual({
-      'node-1': 'f_1',
+      nodeToForm: {
+        'node-1': 'f_1',
+      },
+      formNames: {
+        'f_1': 'f_1',
+      },
+    });
+  });
+
+  it('uses node name when available in formNames', () => {
+    const nodes: ApiNode[] = [
+      {
+        id: 'node-1',
+        type: 'form',
+        data: { component_id: 'f_1', name: 'Form One' },
+      },
+      {
+        id: 'node-2',
+        type: 'form',
+        data: { component_id: 'f_2' },
+      },
+    ];
+
+    const result = buildNodeToFormMap(nodes);
+
+    expect(result).toEqual({
+      nodeToForm: {
+        'node-1': 'f_1',
+        'node-2': 'f_2',
+      },
+      formNames: {
+        'f_1': 'Form One',
+        'f_2': 'f_2',
+      },
     });
   });
 
   it('returns an empty map when given an empty array', () => {
     const result = buildNodeToFormMap([]);
-    expect(result).toEqual({});
+    expect(result).toEqual({
+      nodeToForm: {},
+      formNames: {},
+    });
   });
 });
