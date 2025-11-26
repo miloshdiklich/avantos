@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Form, PrefillMappings } from '../types/domain';
+import type { Form, PrefillMappings, PrefillSource } from '../types/domain';
 import { useGraphData } from '../hooks/useGraphData';
 import FormList from '../components/forms/FormList';
 import ConfigureFieldDialog from '../components/forms/ConfigureFieldDialog';
@@ -19,19 +19,18 @@ const FormsPage = () => {
   const directParentIds = selectedForm
     ? getDirectParents(selectedForm.id, edges)
     : [];
-  
+
   const transitiveParentIds = selectedForm
     ? getTransitiveParents(selectedForm.id, edges)
     : [];
 
-  // Convert IDs → actual Form objects
   const directParents: Form[] = directParentIds
-    .map((id) => forms.find((f) => f.id === id) ?? null)
-    .filter((f): f is Form => f !== null);
-  
+    .map((id) => forms.find(form => form.id === id) ?? null)
+    .filter((form): form is Form => form !== null);
+
   const transitiveParents: Form[] = transitiveParentIds
-    .map((id) => forms.find((f) => f.id === id) ?? null)
-    .filter((f): f is Form => f !== null);
+    .map((id) => forms.find(form => form.id === id) ?? null)
+    .filter((form): form is Form => form !== null);
 
   const currentFormMappings = selectedForm
     ? mappings[selectedForm.id] ?? {}
@@ -51,6 +50,38 @@ const FormsPage = () => {
     setEditingFieldId(null);
   };
 
+  const handleSourceSelected = (source: PrefillSource): void => {
+    if (!selectedForm || !editingFieldId) {
+      handleCloseDialog();
+      return;
+    }
+
+    let display: string;
+
+    if (source.type === 'form') {
+      const sourceForm = forms.find(form => form.id === source.formId);
+      const formName = sourceForm?.name ?? source.formId;
+      display = `${formName}.${source.fieldId}`;
+    } else {
+      const prefix = source.category === 'action' ? 'Action' : 'Client';
+      display = `${prefix}.${source.key}`;
+    }
+
+    setMappings((prev) => {
+      const formMappings = prev[selectedForm.id] ?? {};
+
+      return {
+        ...prev,
+        [selectedForm.id]: {
+          ...formMappings,
+          [editingFieldId]: display,
+        },
+      };
+    });
+
+    handleCloseDialog();
+  };
+
   const handleClearMapping = (fieldId: string): void => {
     if (!selectedForm) {
       return;
@@ -66,31 +97,6 @@ const FormsPage = () => {
       };
     });
   };
-
-  const handleSourceSelected = (source: {
-    type: 'form';
-    formId: string;
-    fieldId: string;
-  }): void => {
-    if (!selectedForm || !editingFieldId) {
-      handleCloseDialog();
-      return;
-    }
-  
-    // Temporary display label
-    const display = `${source.formId}.${source.fieldId}`;
-  
-    setMappings((prev) => ({
-      ...prev,
-      [selectedForm.id]: {
-        ...(prev[selectedForm.id] ?? {}),
-        [editingFieldId]: display,
-      },
-    }));
-  
-    handleCloseDialog();
-  };
-  
 
   if (isLoading) {
     return <div style={{ padding: '1rem' }}>Loading forms…</div>;
@@ -132,18 +138,18 @@ const FormsPage = () => {
         </aside>
 
         <main style={{ flex: 1, padding: '1rem' }}>
-          <h2 style={{ marginTop: 0 }}>Prefill configuration</h2>
+          <h2 style={{ marginTop: 0, textAlign: 'center' }}>Prefill configuration</h2>
 
           {selectedForm === null ? (
             <p>Select a form on the left to configure its prefill rules.</p>
           ) : (
             <div>
-              <h3>{selectedForm.name}</h3>
+              <h3 style={{ textAlign: 'center' }}>{selectedForm.name}</h3>
 
               {selectedForm.fields.length === 0 ? (
                 <p>This form has no fields defined in its schema.</p>
               ) : (
-                <table style={{ borderCollapse: 'collapse', minWidth: '480px' }}>
+                <table style={{ borderCollapse: 'collapse', minWidth: '480px', margin: '0 auto' }}>
                   <thead>
                     <tr>
                       <th style={{ textAlign: 'left', padding: '4px' }}>Field</th>
@@ -199,7 +205,6 @@ const FormsPage = () => {
           onCancel={handleCloseDialog}
         />
       )}
-
     </>
   );
 };

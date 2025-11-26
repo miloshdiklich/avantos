@@ -16,3 +16,15 @@ export type Edge = {
 
 // formId -> (fieldId -> sourceLabel)
 export type PrefillMappings = Record<string, Record<string, string>>;
+
+export type PrefillSource = 
+  | {
+      type: 'form',
+      formId: string,
+      fieldId: string,
+    }
+  | {
+      type: 'global',
+      category: 'action' | 'client',
+      key: string,
+    }
