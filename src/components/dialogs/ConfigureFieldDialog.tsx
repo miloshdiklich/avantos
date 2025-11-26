@@ -43,13 +43,13 @@ const ConfigureFieldDialog = ({
             <p className="configure-field-dialog__empty-state">No direct parents available.</p>
           ) : (
             directParents.map((parent) => (
-              <div key={parent.id} className="configure-field-dialog__parent-block">
+              <div key={`direct-${parent.id}`} className="configure-field-dialog__parent-block">
                 <div className="configure-field-dialog__parent-name">
                   {parent.name}
                 </div>
                 <ul className="configure-field-dialog__list">
                   {parent.fields.map((field) => (
-                    <li key={field.id} className="configure-field-dialog__list-item">
+                    <li key={`${parent.id}.${field.id}`} className="configure-field-dialog__list-item">
                       <button
                         type="button"
                         onClick={() =>
@@ -78,13 +78,13 @@ const ConfigureFieldDialog = ({
             <p className="configure-field-dialog__empty-state">No transitive parents available.</p>
           ) : (
             transitiveParents.map((parent) => (
-              <div key={parent.id} className="configure-field-dialog__parent-block">
+              <div key={`transitive-${parent.id}`} className="configure-field-dialog__parent-block">
                 <div className="configure-field-dialog__parent-name">
                   {parent.name}
                 </div>
                 <ul className="configure-field-dialog__list">
                   {parent.fields.map((field) => (
-                    <li key={field.id} className="configure-field-dialog__list-item">
+                    <li key={`${parent.id}.${field.id}`} className="configure-field-dialog__list-item">
                       <button
                         type="button"
                         onClick={() =>

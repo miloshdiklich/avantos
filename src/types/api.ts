@@ -16,6 +16,7 @@ export type ApiNode = {
   type?: string,
   data?: {
     component_id?: string,
+    name?: string,
   }
 }
 

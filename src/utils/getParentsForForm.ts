@@ -5,10 +5,13 @@ export interface ParentsForForm {
   transitive: Form[];
 }
 
-const getDirectParentIds = (formId: string, edges: Edge[]): string[] =>
-  edges
+const getDirectParentIds = (formId: string, edges: Edge[]): string[] => {
+  const ids = edges
     .filter((edge) => edge.target === formId)
     .map((edge) => edge.source);
+
+  return Array.from(new Set(ids)); // deduplicate keys
+}
 
 const getAllAncestorIds = (formId: string, edges: Edge[]): string[] => {
   const visited = new Set<string>();
