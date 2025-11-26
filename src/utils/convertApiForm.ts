@@ -1,6 +1,6 @@
 import type { ApiForm } from "../types/api";
 import type { Form } from "../types/domain";
-import mapPropertiesToFields from "./schema";
+import mapPropertiesToFields from "./mapPropertiesToFields";
 
 const convertApiForm = (apiForm: ApiForm): Form => {
   return {

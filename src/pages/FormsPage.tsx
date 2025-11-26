@@ -3,7 +3,8 @@ import type { Form, PrefillMappings, PrefillSource } from '../types/domain';
 import { useGraphData } from '../hooks/useGraphData';
 import FormList from '../components/forms/FormList';
 import ConfigureFieldDialog from '../components/forms/ConfigureFieldDialog';
-import { getDirectParents, getTransitiveParents } from '../utils/graph';
+import { getParentsForForm } from '../utils/getParentsForForm';
+import { formatPrefillSource } from '../utils/formatPrefillSource';
 
 const FormsPage = () => {
   const { forms, edges, isLoading, error } = useGraphData();
@@ -16,21 +17,12 @@ const FormsPage = () => {
   const selectedForm: Form | null =
     forms.find((form) => form.id === selectedFormId) ?? null;
 
-  const directParentIds = selectedForm
-    ? getDirectParents(selectedForm.id, edges)
-    : [];
-
-  const transitiveParentIds = selectedForm
-    ? getTransitiveParents(selectedForm.id, edges)
-    : [];
-
-  const directParents: Form[] = directParentIds
-    .map((id) => forms.find(form => form.id === id) ?? null)
-    .filter((form): form is Form => form !== null);
-
-  const transitiveParents: Form[] = transitiveParentIds
-    .map((id) => forms.find(form => form.id === id) ?? null)
-    .filter((form): form is Form => form !== null);
+  // Get direct and transitive parents
+  const { direct: directParents, transitive: transitiveParents} = getParentsForForm(
+    selectedFormId,
+    forms,
+    edges,
+  );
 
   const currentFormMappings = selectedForm
     ? mappings[selectedForm.id] ?? {}
@@ -56,16 +48,7 @@ const FormsPage = () => {
       return;
     }
 
-    let display: string;
-
-    if (source.type === 'form') {
-      const sourceForm = forms.find(form => form.id === source.formId);
-      const formName = sourceForm?.name ?? source.formId;
-      display = `${formName}.${source.fieldId}`;
-    } else {
-      const prefix = source.category === 'action' ? 'Action' : 'Client';
-      display = `${prefix}.${source.key}`;
-    }
+    const display = formatPrefillSource(source, forms);    
 
     setMappings((prev) => {
       const formMappings = prev[selectedForm.id] ?? {};
@@ -122,6 +105,7 @@ const FormsPage = () => {
   return (
     <>
       <div style={{ display: 'flex', height: '100vh' }}>
+        {/* Left panel - List of Forms */}
         <aside
           style={{
             width: '260px',
@@ -136,7 +120,8 @@ const FormsPage = () => {
             onSelectForm={setSelectedFormId}
           />
         </aside>
-
+        
+        {/* Right panel - details, prefill editor */}
         <main style={{ flex: 1, padding: '1rem' }}>
           <h2 style={{ marginTop: 0, textAlign: 'center' }}>Prefill configuration</h2>
 

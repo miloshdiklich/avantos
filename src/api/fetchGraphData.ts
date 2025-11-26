@@ -1,6 +1,7 @@
 import type { Form, Edge } from "../types/domain";
-import type { ApiGraphResponse, ApiNode } from "../types/api";
+import type { ApiGraphResponse } from "../types/api";
 import convertApiForm from "../utils/convertApiForm";
+import { buildNodeToFormMap } from "../utils/buildNodeToFormMap";
 
 interface GraphData {
   forms: Form[],
@@ -9,20 +10,8 @@ interface GraphData {
 
 const GRAPH_ENDPOINT = `${import.meta.env.VITE_GRAPH_BASE_URL.replace(/\/$/, '')}/api/v1/test/actions/blueprints/my-blueprint/graph`;
 
-const buildNodeToFormMap = (nodes: ApiNode[]): Record<string, string> => {
-  const map: Record<string, string> = {};
 
-  nodes.forEach((node) => {
-    if (node.type === 'form' && node.data?.component_id) {
-      map[node.id] = node.data.component_id;
-    }
-  });
-
-  return map;
-};
-
-
-export const fetchGraphForms = async (): Promise<GraphData> => {
+export const fetchGraphData = async (): Promise<GraphData> => {
   const response = await fetch(GRAPH_ENDPOINT);
 
   if(!response.ok) {

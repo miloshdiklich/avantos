@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import type { Edge, Form } from "../types/domain"
-import { fetchGraphForms } from "../api/graph";
+import { fetchGraphData } from "../api/fetchGraphData";
 
 interface UseGraphData {
   forms: Form[],
@@ -17,7 +17,7 @@ export const useGraphData = (): UseGraphData => {
 
   const loadResults = async (): Promise<void> => {
     try {
-      const graphData = await fetchGraphForms();
+      const graphData = await fetchGraphData();
       setForms(graphData.forms);
       setEdges(graphData.edges);
       setError(null);
