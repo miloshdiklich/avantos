@@ -5,7 +5,11 @@ This project is a React application bootstrapped with Vite and TypeScript.
 ### Prerequisites
 
 - Ensure a **local mock server** is running and accessible on **port 3000** (e.g. `http://localhost:3000`).
-- Create your environment file by copying `.env.example` to `.env` in the project root, and adjust values as needed.
+- Create your environment file by copying `.env.example` to `.env` in the project root:
+
+  ```bash
+  cp .env.example .env
+  ```
 
 ### How to run the project
 
@@ -33,3 +37,9 @@ This project uses Jest, you can run them with:
 ```bash
 npm test
 ```
+
+### Project details
+
+Project specfics can be found in `src/README.md`
+
+
