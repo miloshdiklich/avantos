@@ -1,0 +1,58 @@
+.forms-page {
+  display: flex;
+  height: 100vh;
+}
+
+.forms-page__sidebar {
+  width: 260px;
+  border-right: 1px solid #ddd;
+  padding: 1rem;
+}
+
+.forms-page__title {
+  margin-top: 0;
+}
+
+.forms-page__main {
+  flex: 1;
+  padding: 1rem;
+}
+
+.forms-page__main-title {
+  margin-top: 0;
+  text-align: center;
+}
+
+.forms-page__form-name {
+  text-align: center;
+}
+
+.forms-page__table {
+  border-collapse: collapse;
+  min-width: 480px;
+  margin: 0 auto;
+}
+
+.forms-page__table-header {
+  text-align: left;
+  padding: 4px;
+}
+
+.forms-page__table-cell {
+  padding: 4px;
+}
+
+.forms-page__clear-button {
+  margin-left: 0.5rem;
+}
+
+.forms-page__message {
+  padding: 1rem;
+}
+
+.forms-page__message--error {
+  padding: 1rem;
+  color: red;
+}
+
+

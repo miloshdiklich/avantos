@@ -2,9 +2,10 @@ import { useState } from 'react';
 import type { Form, PrefillMappings, PrefillSource } from '../types/domain';
 import { useGraphData } from '../hooks/useGraphData';
 import FormList from '../components/forms/FormList';
-import ConfigureFieldDialog from '../components/forms/ConfigureFieldDialog';
+import ConfigureFieldDialog from '../components/dialogs/ConfigureFieldDialog';
 import { getParentsForForm } from '../utils/getParentsForForm';
 import { formatPrefillSource } from '../utils/formatPrefillSource';
+import './FormsPage.scss';
 
 const FormsPage = () => {
   const { forms, edges, isLoading, error } = useGraphData();
@@ -82,19 +83,19 @@ const FormsPage = () => {
   };
 
   if (isLoading) {
-    return <div style={{ padding: '1rem' }}>Loading forms…</div>;
+    return <div className="forms-page__message">Loading forms…</div>;
   }
 
   if (error !== null) {
     return (
-      <div style={{ padding: '1rem', color: 'red' }}>
+      <div className="forms-page__message forms-page__message--error">
         Error loading forms: {error}
       </div>
     );
   }
 
   if (forms.length === 0) {
-    return <div style={{ padding: '1rem' }}>No forms available.</div>;
+    return <div className="forms-page__message">No forms available.</div>;
   }
 
   const editingField =
@@ -104,16 +105,10 @@ const FormsPage = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', height: '100vh' }}>
+      <div className="forms-page">
         {/* Left panel - List of Forms */}
-        <aside
-          style={{
-            width: '260px',
-            borderRight: '1px solid #ddd',
-            padding: '1rem',
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>Forms</h2>
+        <aside className="forms-page__sidebar">
+          <h2 className="forms-page__title">Forms</h2>
           <FormList
             forms={forms}
             selectedFormId={selectedFormId}
@@ -122,24 +117,24 @@ const FormsPage = () => {
         </aside>
         
         {/* Right panel - details, prefill editor */}
-        <main style={{ flex: 1, padding: '1rem' }}>
-          <h2 style={{ marginTop: 0, textAlign: 'center' }}>Prefill configuration</h2>
+        <main className="forms-page__main">
+          <h2 className="forms-page__main-title">Prefill configuration</h2>
 
           {selectedForm === null ? (
             <p>Select a form on the left to configure its prefill rules.</p>
           ) : (
             <div>
-              <h3 style={{ textAlign: 'center' }}>{selectedForm.name}</h3>
+              <h3 className="forms-page__form-name">{selectedForm.name}</h3>
 
               {selectedForm.fields.length === 0 ? (
                 <p>This form has no fields defined in its schema.</p>
               ) : (
-                <table style={{ borderCollapse: 'collapse', minWidth: '480px', margin: '0 auto' }}>
+                <table className="forms-page__table">
                   <thead>
                     <tr>
-                      <th style={{ textAlign: 'left', padding: '4px' }}>Field</th>
-                      <th style={{ textAlign: 'left', padding: '4px' }}>Prefill from</th>
-                      <th style={{ textAlign: 'left', padding: '4px' }}>Actions</th>
+                      <th className="forms-page__table-header">Field</th>
+                      <th className="forms-page__table-header">Prefill from</th>
+                      <th className="forms-page__table-header">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -148,11 +143,11 @@ const FormsPage = () => {
 
                       return (
                         <tr key={field.id}>
-                          <td style={{ padding: '4px' }}>{field.label}</td>
-                          <td style={{ padding: '4px' }}>
+                          <td className="forms-page__table-cell">{field.label}</td>
+                          <td className="forms-page__table-cell">
                             {sourceLabel ?? 'Not configured'}
                           </td>
-                          <td style={{ padding: '4px' }}>
+                          <td className="forms-page__table-cell">
                             <button
                               type="button"
                               onClick={() => handleOpenConfigure(field.id)}
@@ -163,7 +158,7 @@ const FormsPage = () => {
                               <button
                                 type="button"
                                 onClick={() => handleClearMapping(field.id)}
-                                style={{ marginLeft: '0.5rem' }}
+                                className="forms-page__clear-button"
                               >
                                 Clear
                               </button>

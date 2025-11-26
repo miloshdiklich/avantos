@@ -1,4 +1,5 @@
 import type { Form, PrefillSource } from '../../types/domain';
+import './ConfigureFieldDialog.scss';
 
 interface ConfigureFieldDialogProps {
   isOpen: boolean;
@@ -11,33 +12,6 @@ interface ConfigureFieldDialogProps {
 
 const actionProperties: string[] = ['status', 'created_at', 'type'];
 const clientProperties: string[] = ['name', 'id', 'segment'];
-
-const sectionTitleStyle: React.CSSProperties = {
-  margin: '0 0 0.5rem',
-};
-
-const chipButtonStyle: React.CSSProperties = {
-  padding: '0.25rem 0.5rem',
-  borderRadius: '4px',
-  border: '1px solid #ccc',
-  background: '#f8f8f8',
-  cursor: 'pointer',
-  color: 'black',
-};
-
-const listStyle: React.CSSProperties = {
-  listStyle: 'none',
-  paddingLeft: 0,
-  margin: 0,
-};
-
-const listItemStyle: React.CSSProperties = {
-  marginBottom: '0.25rem',
-};
-
-const parentBlockStyle: React.CSSProperties = {
-  marginBottom: '0.5rem',
-};
 
 const ConfigureFieldDialog = ({
   isOpen,
@@ -52,52 +26,30 @@ const ConfigureFieldDialog = ({
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.35)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 10,
-        color: 'black',
-      }}
-    >
-      <div
-        style={{
-          background: 'white',
-          padding: '1rem',
-          borderRadius: '4px',
-          minWidth: '360px',
-          maxWidth: '640px',
-          maxHeight: '80vh',
-          overflow: 'auto',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-        }}
-      >
-        <h3 style={{ marginTop: 0, marginBottom: '0.5rem', textAlign: 'center' }}>
+    <div className="configure-field-dialog-backdrop">
+      <div className="configure-field-dialog">
+        <h3 className="configure-field-dialog__title">
           Configure prefill
         </h3>
 
-        <p style={{ marginTop: 0, marginBottom: '1rem', textAlign: 'center' }}>
+        <p className="configure-field-dialog__subtitle">
           Target field: <strong>{fieldLabel}</strong>
         </p>
 
         {/* Direct parents */}
-        <section style={{ marginBottom: '1rem' }}>
-          <h4 style={sectionTitleStyle}>Direct parent forms</h4>
+        <section className="configure-field-dialog__section">
+          <h4 className="configure-field-dialog__section-title">Direct parent forms</h4>
           {directParents.length === 0 ? (
-            <p style={{ margin: 0, opacity: 0.7 }}>No direct parents available.</p>
+            <p className="configure-field-dialog__empty-state">No direct parents available.</p>
           ) : (
             directParents.map((parent) => (
-              <div key={parent.id} style={parentBlockStyle}>
-                <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
+              <div key={parent.id} className="configure-field-dialog__parent-block">
+                <div className="configure-field-dialog__parent-name">
                   {parent.name}
                 </div>
-                <ul style={listStyle}>
+                <ul className="configure-field-dialog__list">
                   {parent.fields.map((field) => (
-                    <li key={field.id} style={listItemStyle}>
+                    <li key={field.id} className="configure-field-dialog__list-item">
                       <button
                         type="button"
                         onClick={() =>
@@ -107,7 +59,7 @@ const ConfigureFieldDialog = ({
                             fieldId: field.id,
                           })
                         }
-                        style={chipButtonStyle}
+                        className="configure-field-dialog__chip-button"
                       >
                         {field.label}
                       </button>
@@ -120,19 +72,19 @@ const ConfigureFieldDialog = ({
         </section>
 
         {/* Transitive parents */}
-        <section style={{ marginBottom: '1rem' }}>
-          <h4 style={sectionTitleStyle}>Transitive parent forms</h4>
+        <section className="configure-field-dialog__section">
+          <h4 className="configure-field-dialog__section-title">Transitive parent forms</h4>
           {transitiveParents.length === 0 ? (
-            <p style={{ margin: 0, opacity: 0.7 }}>No transitive parents available.</p>
+            <p className="configure-field-dialog__empty-state">No transitive parents available.</p>
           ) : (
             transitiveParents.map((parent) => (
-              <div key={parent.id} style={parentBlockStyle}>
-                <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
+              <div key={parent.id} className="configure-field-dialog__parent-block">
+                <div className="configure-field-dialog__parent-name">
                   {parent.name}
                 </div>
-                <ul style={listStyle}>
+                <ul className="configure-field-dialog__list">
                   {parent.fields.map((field) => (
-                    <li key={field.id} style={listItemStyle}>
+                    <li key={field.id} className="configure-field-dialog__list-item">
                       <button
                         type="button"
                         onClick={() =>
@@ -142,7 +94,7 @@ const ConfigureFieldDialog = ({
                             fieldId: field.id,
                           })
                         }
-                        style={chipButtonStyle}
+                        className="configure-field-dialog__chip-button"
                       >
                         {field.label}
                       </button>
@@ -155,14 +107,14 @@ const ConfigureFieldDialog = ({
         </section>
 
         {/* Global data */}
-        <section style={{ marginBottom: '1rem' }}>
-          <h4 style={sectionTitleStyle}>Global data</h4>
+        <section className="configure-field-dialog__section">
+          <h4 className="configure-field-dialog__section-title">Global data</h4>
 
-          <div style={{ marginBottom: '0.5rem' }}>
-            <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Action properties</div>
-            <ul style={listStyle}>
+          <div>
+            <div className="configure-field-dialog__parent-name">Action properties</div>
+            <ul className="configure-field-dialog__list">
               {actionProperties.map((key) => (
-                <li key={key} style={listItemStyle}>
+                <li key={key} className="configure-field-dialog__list-item">
                   <button
                     type="button"
                     onClick={() =>
@@ -172,7 +124,7 @@ const ConfigureFieldDialog = ({
                         key,
                       })
                     }
-                    style={chipButtonStyle}
+                    className="configure-field-dialog__chip-button"
                   >
                     {key}
                   </button>
@@ -182,12 +134,10 @@ const ConfigureFieldDialog = ({
           </div>
 
           <div>
-            <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
-              Client organisation properties
-            </div>
-            <ul style={listStyle}>
+            <div className="configure-field-dialog__parent-name">Client organisation properties</div>
+            <ul className="configure-field-dialog__list">
               {clientProperties.map((key) => (
-                <li key={key} style={listItemStyle}>
+                <li key={key} className="configure-field-dialog__list-item">
                   <button
                     type="button"
                     onClick={() =>
@@ -197,7 +147,7 @@ const ConfigureFieldDialog = ({
                         key,
                       })
                     }
-                    style={chipButtonStyle}
+                    className="configure-field-dialog__chip-button"
                   >
                     {key}
                   </button>
@@ -207,13 +157,7 @@ const ConfigureFieldDialog = ({
           </div>
         </section>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginTop: '0.5rem',
-          }}
-        >
+        <div className="configure-field-dialog__footer">
           <button type="button" onClick={onCancel}>
             Cancel
           </button>

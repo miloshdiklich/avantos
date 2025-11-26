@@ -1,0 +1,82 @@
+.configure-field-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: black;
+}
+
+.configure-field-dialog {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 4px;
+  min-width: 360px;
+  max-width: 640px;
+  max-height: 80vh;
+  overflow: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.configure-field-dialog__title {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.configure-field-dialog__subtitle {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.configure-field-dialog__section {
+  margin-bottom: 1rem;
+}
+
+.configure-field-dialog__section-title {
+  margin: 0 0 0.5rem;
+}
+
+.configure-field-dialog__empty-state {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.configure-field-dialog__parent-block {
+  margin-bottom: 0.5rem;
+}
+
+.configure-field-dialog__parent-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.configure-field-dialog__list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.configure-field-dialog__list-item {
+  margin-bottom: 0.25rem;
+}
+
+.configure-field-dialog__chip-button {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  cursor: pointer;
+  color: black;
+}
+
+.configure-field-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+
