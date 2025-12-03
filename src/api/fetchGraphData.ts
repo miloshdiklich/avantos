@@ -1,7 +1,8 @@
 import type { Form, Edge } from "../types/domain";
 import type { ApiGraphResponse } from "../types/api";
-import convertApiForm from "../utils/convertApiForm";
-import { buildNodeToFormMap } from "../utils/buildNodeToFormMap";
+import { buildTemplateMap } from "../utils/buildTemplateMap";
+import { buildFormsFromNodes } from "../utils/buildFormsFromNodes";
+import { buildEdgesFromApi } from "../utils/buildEdgesFromApi";
 
 interface GraphData {
   forms: Form[];
@@ -19,37 +20,10 @@ export const fetchGraphData = async (): Promise<GraphData> => {
 
   const data = (await response.json()) as ApiGraphResponse;
 
-  const { nodeToForm, formNames } = buildNodeToFormMap(data.nodes ?? []);
-
-  // Override name from node metadata
-  const formsById = new Map<string, Form>();
-
-  (data.forms ?? []).forEach((apiForm) => {
-    if (!formsById.has(apiForm.id)) {
-      formsById.set(
-        apiForm.id,
-        convertApiForm(apiForm, formNames[apiForm.id])
-      );
-    }
-  });
-
-  const forms: Form[] = Array.from(formsById.values());
-
-  const edges: Edge[] = (data.edges ?? [])
-    .map((edge) => {
-      const sourceFormId = nodeToForm[edge.source];
-      const targetFormId = nodeToForm[edge.target];
-
-      if (!sourceFormId || !targetFormId) {
-        return null;
-      }
-
-      return {
-        source: sourceFormId,
-        target: targetFormId,
-      };
-    })
-    .filter((edge): edge is Edge => edge !== null);
+  const templateMap = buildTemplateMap(data.forms);
+  const forms = buildFormsFromNodes(data.nodes, templateMap)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const edges = buildEdgesFromApi(data.edges);
 
   return { forms, edges };
 };
