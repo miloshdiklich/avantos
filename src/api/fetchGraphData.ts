@@ -3,6 +3,7 @@ import type { ApiGraphResponse } from "../types/api";
 import { buildTemplateMap } from "../utils/buildTemplateMap";
 import { buildFormsFromNodes } from "../utils/buildFormsFromNodes";
 import { buildEdgesFromApi } from "../utils/buildEdgesFromApi";
+import { sortFormsTopologically } from "../utils/sortFormsTopologially";
 
 interface GraphData {
   forms: Form[];
@@ -21,9 +22,10 @@ export const fetchGraphData = async (): Promise<GraphData> => {
   const data = (await response.json()) as ApiGraphResponse;
 
   const templateMap = buildTemplateMap(data.forms);
-  const forms = buildFormsFromNodes(data.nodes, templateMap)
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const unsortedForms: Form[] = buildFormsFromNodes(data.nodes ?? [], templateMap);
   const edges = buildEdgesFromApi(data.edges);
+
+  const forms = sortFormsTopologically(unsortedForms, edges);
 
   return { forms, edges };
 };
