@@ -1,4 +1,5 @@
-import type { Form } from "../../types/domain"
+import type { Form } from "../../types/domain";
+import "./FormList.scss";
 
 interface FormListProps {
   forms: Form[],
@@ -13,7 +14,7 @@ const FormList = ({
 }: FormListProps) => {
 
   return (
-    <ul>
+    <ul className="form-list">
       {
         forms.map(form => (
           <li key={form.id}>
